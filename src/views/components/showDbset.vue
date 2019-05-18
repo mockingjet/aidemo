@@ -43,8 +43,8 @@ export default {
   }),
   methods:{
     upload(dirname,i) {
-      const URL = "http://localhost/AIDemo/public/input.php";
-      // const URL = "/add/data/training";
+      // const URL = "http://localhost/AIDemo/public/input.php";
+      const URL = "/add/data/training";
       this.api.post(URL, dirname).then(() => {
         this.hasUploaded[i] = true
         this.$forceUpdate()

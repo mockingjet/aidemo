@@ -103,13 +103,13 @@
 import $ from 'jquery'
 import carousel from 'vue-owl-carousel'
 import predictSet from '@/views/components/predictSet.vue'
-import ImageCircle from '@/views/components/imageCircle.vue'
+import imageCircle from '@/views/components/imageCircle.vue'
 import predictPie from '@/views/components/predictPie.vue'
 import showDbset from '@/views/components/showDbset.vue'
 export default{
   components:{
     predictSet,
-    ImageCircle,
+    imageCircle,
     predictPie,
     showDbset,
     carousel
@@ -157,8 +157,8 @@ export default{
         }
       })
       const formData = new FormData($('#upload-file')[0]);
-      const URL = "http://localhost/AIDemo/public/input.php";
-      // const URL = "/predict/send/new";
+      // const URL = "http://localhost/AIDemo/public/input.php";
+      const URL = "/predict/send/new";
       this.api.post(URL, formData, {
         headers: {
           'accept': 'application/json',
@@ -199,8 +199,8 @@ export default{
           this.swal.showLoading();
         }
       })
-      const URL = "http://localhost/AIDemo/public/modify.php";
-      // const URL = "/send/img/back";
+      // const URL = "http://localhost/AIDemo/public/modify.php";
+      const URL = "/send/img/back";
       this.api.post(URL, this.modified_cricles).then((response) => {
         this.swal.close()
         var d = new Date();
@@ -244,8 +244,8 @@ export default{
               this.swal.showLoading();
             }
           })
-          const URL = "http://localhost/AIDemo/public/confirm.php";
-          // const URL = "/send/dbset";
+          // const URL = "http://localhost/AIDemo/public/confirm.php";
+          const URL = "/send/dbset";
           this.api.get(URL).then((response) => {
             this.swal.close()
             this.dbset = response.data
