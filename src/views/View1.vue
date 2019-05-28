@@ -1,7 +1,7 @@
 <template>
   <div class="v-wrapper">
-    <div class="pa-5 ma-5 v-frame" @click="uploadImage">
-      Upload A Full View Image Here
+    <div class="pa-5 my-5 v-frame" @click="uploadImage">
+      {{ inputImage ? '' : 'Upload A Full View Image Here' }}
       <form id="upload-file" method="post" enctype="multipart/form-data">
         <input 
           type="file" 
@@ -11,10 +11,11 @@
           accept=".png, .jpg, .jpeg, .tif"
           @change="previewImage">
       </form>
-    </div>
-    <viewer :options="options">
+          <viewer :options="options">
       <img :src="inputImage" alt="" style="display:none">
     </viewer>
+    </div>
+
   </div>
 </template>
 <script>
@@ -31,6 +32,7 @@ export default {
   data: ()=>({
     inputImage:null,
     options: {
+      backdrop:false,
       inline: true,
       button: false,
       navbar: false,
@@ -42,12 +44,14 @@ export default {
       rotatable: false,
       scalable: false,
       transition: true,
-      fullscreen: false,
+      fullscreen: true,
       keyboard: false,
+      loading:true
     },
   }),
   methods:{
     uploadImage(){
+      if(this.inputImage) return
       document.getElementById('uploader').click()
     },
     previewImage(e){
@@ -85,14 +89,19 @@ export default {
 <style scoped>
 .v-wrapper{
   background-color: #fff;
-  width:calc(100vw - 16px);
-  height:calc(100vh - 64px);
+  width:512px;
+  height:512px;
+  margin-left:calc(50vw - 256px);
 }
 .v-frame{
+  width:512px;
+  height:512px;
   background-color: #eee;
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.1);
   border:2px solid #aaa;
-  text-align: center;
+  display:flex;
+  align-items: center;
+  justify-content: center;
   font-size:24px;
   color:#666;
   letter-spacing: 1px;

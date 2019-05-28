@@ -1,7 +1,7 @@
 <template>
   <div class="v-wrapper">
-    <div class="pa-5 ma-5 v-frame" @click="uploadImage">
-      <span v-if="!inputImage">Upload A Full View Image Here</span>
+    <div v-if="!inputImage" class="pa-5 my-5 v-frame" @click="uploadImage">
+      <span >Upload A Full View Image Here</span>
       <form id="upload-file" method="post" enctype="multipart/form-data">
         <input 
           type="file" 
@@ -11,11 +11,11 @@
           accept=".png, .jpg, .jpeg, .tif"
           @change="previewImage">
       </form>
-      <quarterImage
-        v-if="inputImage"
-        :inputImage="inputImage">
-      </quarterImage>
-    </div>
+    </div>      
+    <quarterImage
+      v-if="inputImage"
+      :inputImage="inputImage">
+    </quarterImage>
   </div>
 </template>
 <script>
@@ -27,21 +27,6 @@ export default {
   },
   data: ()=>({
     inputImage:null,
-    options: {
-      inline: true,
-      button: false,
-      navbar: false,
-      title: false,
-      toolbar: false,
-      tooltip: true,
-      movable: true,
-      zoomable: true,
-      rotatable: false,
-      scalable: false,
-      transition: true,
-      fullscreen: false,
-      keyboard: false,
-    },
   }),
   methods:{
     uploadImage(){
@@ -82,14 +67,21 @@ export default {
 <style scoped>
 .v-wrapper{
   background-color: #fff;
-  width:calc(100vw - 16px);
-  height:calc(100vh - 64px);
+  width:1024px;
+  height:512px;
+  display:flex;
+  justify-content: center;
+  margin-left:calc(50vw - 512px);
 }
 .v-frame{
+  width:512px;
+  height:512px;
   background-color: #eee;
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.1);
   border:2px solid #aaa;
-  text-align: center;
+  display:flex;
+  align-items: center;
+  justify-content: center;
   font-size:24px;
   color:#666;
   letter-spacing: 1px;

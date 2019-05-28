@@ -30,6 +30,13 @@
         {{ hasUploaded[i] ? "Finished" : "Upload" }}
         <v-icon right dark>cloud_upload</v-icon>
       </v-btn>
+      <v-btn outline
+        style="float:right"
+        color="blue"
+        @click="retrain(item.typename)">
+        Retrain
+        <v-icon right dark>cloud_upload</v-icon>
+      </v-btn>
       <v-divider class="mt-5"></v-divider>
     </div>
     
@@ -43,11 +50,38 @@ export default {
   }),
   methods:{
     upload(dirname,i) {
+      this.swal({
+        customClass:'loadingModal',
+        onOpen:() => {
+          this.swal.showLoading();
+        }
+      })
       // const URL = "http://localhost/AIDemo/public/input.php";
       const URL = "/add/data/training";
       this.api.post(URL, dirname).then(() => {
         this.hasUploaded[i] = true
         this.$forceUpdate()
+        this.swal.close()
+      }).catch((error) => {
+        this.swal({
+          type:'error',
+          title:'好像發生甚麼問題...',
+          text:error
+        })
+      })
+    },
+    retrain(dirname) {
+      this.swal({
+        customClass:'loadingModal',
+        onOpen:() => {
+          this.swal.showLoading();
+        }
+      })
+      // const URL = "http://localhost/AIDemo/public/input.php";
+      const URL = "/add/data/retrain";
+      this.api.post(URL, dirname).then(() => {
+        this.$forceUpdate()
+        this.swal.close()
       }).catch((error) => {
         this.swal({
           type:'error',

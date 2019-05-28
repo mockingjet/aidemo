@@ -8,13 +8,13 @@
       :rewind=false
       :mouseDrag=false
       :touchDrag=false>
-      <template slot="prev">
+      <!-- <template slot="prev">
         <span class="prev">
           <v-btn fab>
             <v-icon>chevron_left</v-icon>
           </v-btn>
         </span>
-      </template>
+      </template> -->
       <div class="slide">
         <div class="imgblock">
           <div v-if="!inputUrl" style="cursor:pointer" @click="uploadImage">Click here to upload</div>
@@ -46,21 +46,33 @@
         <div class="imgblock" id="testImage">
           <div v-if="!output.image_file">Analysis Result</div>
           <img class="imgshow" v-if="output.image_file" :src="output.image_file" alt="">
-          <image-circle 
+          <!-- <image-circle 
             v-for="(circle,i) in output.image_circles" :key="i" 
             :circle="circle" 
             :nth="i"
             @returnColor="getColor">
-          </image-circle>
+          </image-circle> -->
         </div>
-        <v-btn color="secondary" block
-          style="margin:15px 0px; width:94%; margin-left:3%; color:white"
+        <v-btn color="secondary" 
+          style="margin:15px 0px; width:50%; margin-left:3%; color:white"
           :disabled="!output.image_file"
           @click="download(output.image_file)">
           Download
         </v-btn>
+        <v-btn color="secondary" 
+          style="margin:15px 0px; width:20%; margin-left:2%; color:white"
+          :disabled="!output.image_file"
+          @click="openview('./view1')">
+          <v-icon>view_comfy</v-icon> &nbsp; View1
+        </v-btn>
+        <v-btn color="secondary" 
+          :disabled="!output.image_file"
+          style="margin:15px 0px; width:20%; margin-left:2%; color:white"
+          @click="openview('./view2')">
+          <v-icon>view_comfy</v-icon> &nbsp; View2
+        </v-btn>
       </div>
-      <div class="slide">
+      <!-- <div class="slide">
         <div class="imgblock" id="modifiedImage">
           <div v-if="!modified.image_file">Modified Result</div>
           <img class="imgshow" v-if="modified.image_file" :src="modified.image_file" alt="">
@@ -71,16 +83,16 @@
           @click="sendConfirm">
           CONFIRM
         </v-btn>
-      </div>
-      <template slot="next" v-show="modified.image_file!=''">
+      </div> -->
+      <!-- <template slot="next" v-show="modified.image_file!=''">
         <span class="next">
           <v-btn fab>
             <v-icon>chevron_right</v-icon>
           </v-btn>
         </span>
-      </template>
+      </template> -->
     </carousel>
-    <div class="row"
+    <!-- <div class="row"
       v-if="output.image_file">
       <div class="col-md-4">
         <predict-set 
@@ -95,7 +107,7 @@
         <img src="@/assets/preindex.jpg" alt="" style="max-width:100%;">
       </div>
     </div>
-    <show-dbset :dbset="dbset" id="dbset"></show-dbset>
+    <show-dbset :dbset="dbset" id="dbset"></show-dbset> -->
   </div>
 </template>
 
@@ -138,6 +150,10 @@ export default{
     })
   },
   methods:{
+    openview(url) {
+      const link = this.$router.resolve({path: url}).href
+      window.open(link, '_blank')
+    },
     refresh() {
       window.location.reload()
     },
