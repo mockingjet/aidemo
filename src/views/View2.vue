@@ -48,7 +48,7 @@ export default {
       if(this.inputImage) return
       document.getElementById('uploader').click()
     },
-    previewImage(e){
+    previewImage(){
       this.swal({
         customClass:'loadingModal',
         onOpen:() => {

@@ -6,6 +6,7 @@
   </div>
   <div class="whole">
     <img class="theImage" :src="nowImage" width="512px" height="512px">
+    <img class="trueImage" :src="nowImage" style="display:none">
     <div class="quarter" @click="quarter(1)" ></div>
     <div class="quarter" @click="quarter(2)" ></div>
     <div class="quarter" @click="quarter(3)" ></div>
@@ -15,7 +16,7 @@
 
 </template>
 <script>
-import $ from 'jquery'
+// import $ from 'jquery'
 export default {
   props:['inputImage'],
   data: () => ({
@@ -23,37 +24,49 @@ export default {
     bigger:[],
   }),
   mounted() {
-    this.nowImage = this.inputImage
+    this.nowImage = "this.inputImage"
     this.bigger.push(this.inputImage)
   },
   methods:{
     quarter(coord) {
-      var img = document.querySelector('.theImage'),
+      this.swal({
+        customClass:'loadingModal',
+        onOpen:() => {
+          this.swal.showLoading();
+        }
+      })
+      var v = this;
+      setTimeout(function(){
+        v.proceed(coord)
+      },100)
+    },
+    proceed(coord) {
+var img = document.querySelector('.trueImage'),
           c = document.createElement("canvas"),
           ctx = c.getContext('2d')
-      c.width = 512
-      c.height = 512
+      c.width = img.naturalWidth/2
+      c.height = img.naturalHeight/2
       switch(coord) {
         case 1:
-          ctx.drawImage(img, 0, 0, img.naturalWidth/2, img.naturalHeight/2, 0, 0, 512, 512)
+          ctx.drawImage(img, 0, 0, img.naturalWidth/2, img.naturalHeight/2, 0, 0, img.naturalWidth/2, img.naturalHeight/2)
           break
         case 2:
-          ctx.drawImage(img, img.naturalWidth/2, 0, img.naturalWidth/2, img.naturalHeight/2, 0, 0, 512, 512)
+          ctx.drawImage(img, img.naturalWidth/2, 0, img.naturalWidth/2, img.naturalHeight/2, 0, 0, img.naturalWidth/2, img.naturalHeight/2)
           break
         case 3:
-          ctx.drawImage(img, 0, img.naturalHeight/2, img.naturalWidth/2, img.naturalHeight, 0, 0, 512, 1024)
+          ctx.drawImage(img, 0, img.naturalHeight/2, img.naturalWidth/2, img.naturalHeight, 0, 0, img.naturalWidth/2, img.naturalHeight)
           break
         case 4:
-          ctx.drawImage(img, img.naturalWidth/2, img.naturalHeight/2, img.naturalWidth, img.naturalHeight, 0, 0, 1024, 1024)            
+          ctx.drawImage(img, img.naturalWidth/2, img.naturalHeight/2, img.naturalWidth, img.naturalHeight, 0, 0, img.naturalWidth, img.naturalHeight)            
           break
       }
-      console.log(img.naturalWidth,img.naturalHeight)
+      // console.log(img.naturalWidth,img.naturalHeight)
       var newImage = c.toDataURL()
       this.nowImage = newImage
       this.bigger.push(newImage)
+      this.swal.close()
     },
     traceback() {
-      
       if(this.bigger.length==1) 
         return
       else {
