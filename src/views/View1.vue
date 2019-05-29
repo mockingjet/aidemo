@@ -41,20 +41,25 @@ export default {
       tooltip: true,
       movable: true,
       zoomable: true,
+      zoomRatio:0.4,
       rotatable: false,
       scalable: false,
       transition: true,
       fullscreen: true,
       keyboard: false,
-      loading:true
+      minZoomRatio:0.01,
+      maxZoomRatio:1
     },
   }),
+  mounted(){
+    this.inputImage = this.$route.query.url
+  },
   methods:{
     uploadImage(){
       if(this.inputImage) return
       document.getElementById('uploader').click()
     },
-    previewImage(e){
+    previewImage(){
       this.swal({
         customClass:'loadingModal',
         onOpen:() => {
@@ -88,14 +93,13 @@ export default {
 </script>
 <style scoped>
 .v-wrapper{
-  background-color: #fff;
-  width:512px;
-  height:512px;
-  margin-left:calc(50vw - 256px);
+  width:80vw;
+  height:calc( 90vh - 100px);
+  margin-left:10vw;
 }
 .v-frame{
-  width:512px;
-  height:512px;
+  width:80vw;
+  height:calc( 90vh - 100px);
   background-color: #eee;
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.1);
   border:2px solid #aaa;

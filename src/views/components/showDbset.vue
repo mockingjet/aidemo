@@ -2,10 +2,13 @@
   <v-card class="my-5">
     <v-toolbar v-show="dbset" dark color="secondary">
       <v-toolbar-title>Database Status</v-toolbar-title>
-      <!-- <v-spacer></v-spacer>
-      <v-toolbar-items>
-        <v-btn dark flat @click="refresh" style="text-transform:none;font-size:16px;letter-spacing:1px">OK, I got it!</v-btn>
-      </v-toolbar-items> -->
+      <v-spacer></v-spacer>
+      <v-btn 
+        color="blue"
+        @click="retrain()">
+        Retrain
+        <v-icon right dark>settings_backup_restore</v-icon>
+      </v-btn>
     </v-toolbar>
     <div v-for="(item,i) in dbset" :key=i
       style="padding:8px 12px 0px 8px;">
@@ -30,13 +33,7 @@
         {{ hasUploaded[i] ? "Finished" : "Upload" }}
         <v-icon right dark>cloud_upload</v-icon>
       </v-btn>
-      <v-btn outline
-        style="float:right"
-        color="blue"
-        @click="retrain(item.typename)">
-        Retrain
-        <v-icon right dark>cloud_upload</v-icon>
-      </v-btn>
+
       <v-divider class="mt-5"></v-divider>
     </div>
     
@@ -70,16 +67,17 @@ export default {
         })
       })
     },
-    retrain(dirname) {
+    retrain() {
       this.swal({
         customClass:'loadingModal',
+        allowOutsideClick: false,
         onOpen:() => {
           this.swal.showLoading();
         }
       })
-      // const URL = "http://localhost/AIDemo/public/input.php";
-      const URL = "/add/data/retrain";
-      this.api.post(URL, dirname).then(() => {
+      // const URL = "http://localhost/AIDemo/public/input.php"
+      const URL = "/add/data/retrain"
+      this.api.post(URL).then(() => {
         this.$forceUpdate()
         this.swal.close()
       }).catch((error) => {

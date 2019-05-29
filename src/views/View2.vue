@@ -27,7 +27,10 @@ export default {
   },
   data: ()=>({
     inputImage:null,
-  }),
+  }),  
+  mounted(){
+    this.inputImage = this.$route.query.url
+  },
   methods:{
     uploadImage(){
       if(this.inputImage) return
@@ -66,7 +69,6 @@ export default {
 </script>
 <style scoped>
 .v-wrapper{
-  background-color: #fff;
   width:1024px;
   height:512px;
   display:flex;

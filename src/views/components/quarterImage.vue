@@ -1,8 +1,8 @@
 <template>
   <div class="v-cabinet my-5">
-    <div class="bigger" @click="traceback">
-      <img :src="bigger[bigger.length-2] ? bigger[bigger.length-2] : bigger[bigger.length-1]">
-      <v-icon x-large class="btn-restore">restore</v-icon>
+    <div class="origin">
+      <img :src="inputImage" alt="">
+      <div class="focus"></div>
     </div>
     <div class="whole">
       <img class="theImage" :src="nowImage" width="512px" height="512px">
@@ -11,7 +11,26 @@
       <div class="quarter" @click="quarter(2)" ></div>
       <div class="quarter" @click="quarter(3)" ></div>
       <div class="quarter" @click="quarter(4)" ></div>
+      <img 
+        @click="traceback"
+        style="position:absolute; right:-120px; width: 90px; height:90px; top:216px;"
+        v-show="former[former.length-2]"
+        :src="former[former.length-2] ? former[former.length-2] : former[former.length-1]">
+      <v-icon 
+        x-large
+        @click="traceback"
+        v-show="former[former.length-2]"
+        style="position:absolute; right:-95px; top:240px"
+      >restore</v-icon>
     </div>
+    <!-- <v-alert
+      style="position:absolute; bottom:calc(50% - 40px); right:calc(50% - 450px); z-index:999"
+      :value="tip"
+      color="warning"
+      icon="priority_high"
+      transition="scale-transition">
+      100% Image can't be split further
+    </v-alert> -->
   </div>
 </template>
 <script>
@@ -20,24 +39,26 @@ export default {
   props:['inputImage'],
   data: () => ({
     nowImage:null,
-    bigger:[],
+    former:[],
+    record:[],
+    // tip:false
   }),
   mounted() {
     this.nowImage = this.inputImage
-    this.bigger.push(this.inputImage)
+    this.former.push(this.inputImage)
   },
   methods:{
     quarter(coord) {
       this.swal({
         customClass:'loadingModal',
+        allowOutsideClick: false,
         onOpen:() => {
           this.swal.showLoading();
         }
       })
-      var v = this;
       setTimeout(function(){
-        v.proceed(coord)
-      },100)
+        this.proceed(coord)
+      }.bind(this),100)
     },
     proceed(coord) {
       var img = document.querySelector('.trueImage'),
@@ -45,6 +66,11 @@ export default {
           ctx = c.getContext('2d')
       c.width = img.naturalWidth/2
       c.height = img.naturalHeight/2
+      if( c.width < 512 || c.height < 512) {
+        this.swal.close()
+        // this.tip = !this.tip
+        return
+      }
       switch(coord) {
         case 1:
           ctx.drawImage(img, 0, 0, img.naturalWidth/2, img.naturalHeight/2, 0, 0, img.naturalWidth/2, img.naturalHeight/2)
@@ -59,20 +85,68 @@ export default {
           ctx.drawImage(img, img.naturalWidth/2, img.naturalHeight/2, img.naturalWidth, img.naturalHeight, 0, 0, img.naturalWidth, img.naturalHeight)            
           break
       }
-      // console.log(img.naturalWidth,img.naturalHeight)
       var newImage = c.toDataURL()
       this.nowImage = newImage
-      this.bigger.push(newImage)
+      this.former.push(newImage)
+      this.record.push(coord)
+      this.focusOn(coord)
       this.swal.close()
     },
+    focusOn(coord){
+      var focus = document.querySelector('.focus')
+      focus.style.width = focus.offsetWidth / 2 +'px'
+      focus.style.height = focus.offsetHeight / 2 + 'px'
+      switch(coord) {
+        case 1:
+          //原封不動
+          break
+        case 2:
+          //向右移動一個width
+          focus.style.left = focus.offsetLeft + focus.offsetWidth + 'px'
+          break
+        case 3:
+          //向下移動一個width
+          focus.style.top = focus.offsetTop + focus.offsetHeight + 'px'
+          break
+        case 4:
+          //向右跟下各移動一個width
+          focus.style.left = focus.offsetLeft + focus.offsetWidth + 'px'
+          focus.style.top = focus.offsetTop + focus.offsetHeight + 'px'
+          break
+      }
+    },
     traceback() {
-      if(this.bigger.length==1) 
+      if(this.former.length==1) 
         return
       else {
-        this.nowImage = this.bigger[this.bigger.length-2]
-        this.bigger.pop()
+        this.nowImage = this.former[this.former.length-2]
+        this.former.pop()
+        var coord = this.record.pop()
+        this.focusOff(coord)
       }
-
+    },
+    focusOff(coord) {
+      var focus = document.querySelector('.focus')
+      focus.style.width = focus.offsetWidth * 2 +'px'
+      focus.style.height = focus.offsetHeight * 2 + 'px'
+      switch(coord) {
+        case 1:
+          //原封不動
+          break
+        case 2:
+          //向左移動半個width
+          focus.style.left = focus.offsetLeft - focus.offsetWidth/2 + 'px'
+          break
+        case 3:
+          //向上移動半個width
+          focus.style.top = focus.offsetTop - focus.offsetHeight/2 + 'px'
+          break
+        case 4:
+          //向左跟上各移動半個width
+          focus.style.left = focus.offsetLeft - focus.offsetWidth/2 + 'px'
+          focus.style.top = focus.offsetTop - focus.offsetHeight/2 + 'px'
+          break
+      }
     }
   },
 }
@@ -108,15 +182,22 @@ export default {
 .quarter:hover{
   border:2px solid darkblue;
 }
-.bigger{
+.origin{
   width:512px;
   height:512px;
   position: relative;
 }
-.bigger img{
+.origin img{
   height:512px;
   width:512px;
   box-shadow:1px 2px 3px 1px rgb(0,0,0,0.5)
+}
+.focus{
+  position:absolute;
+  top:0px;
+  width:512px;
+  height:512px;
+  border:3px dashed darkred;
 }
 .btn-restore{
   position:absolute;
