@@ -8,13 +8,13 @@
       :rewind=false
       :mouseDrag=false
       :touchDrag=false>
-      <template slot="prev">
+      <!-- <template slot="prev">
         <span class="prev">
           <v-btn fab>
             <v-icon>chevron_left</v-icon>
           </v-btn>
         </span>
-      </template>
+      </template> -->
       <div class="slide">
         <div class="imgblock">
           <div v-if="!inputUrl" style="cursor:pointer" @click="uploadImage">Click here to upload</div>
@@ -36,7 +36,7 @@
           </v-btn>
         </div>
         <v-btn color="secondary" block 
-          style="margin:15px 0px 15px 20px; width:512px; color:white"
+          style="margin:15px 0px 15px calc(50% - 256px); width:512px; color:white"
           :disabled="!inputUrl"
           @click="dignoseImage">
           Diagnose
@@ -54,12 +54,12 @@
           </image-circle>
         </div>
         <v-btn color="secondary" 
-          style="margin:15px 0px 15px 20px; width:512px; color:white"
+          style="margin:15px 5px 15px calc(50% - 256px); width:calc(512px - 220px); color:white"
           :disabled="!output.image_file"
           @click="download(output.image_file)">
           Download
         </v-btn>
-        <!-- <v-btn color="secondary" 
+        <v-btn color="secondary" 
           style="margin:15px 5px; width:100px; color:white"
           :disabled="!output.image_file"
           @click="openview('./view1')">
@@ -70,7 +70,7 @@
           style="margin:15px 5px; width:100px; color:white"
           @click="openview('./view2')">
           View2
-        </v-btn> -->
+        </v-btn>
       </div>
       <div class="slide">
         <div class="imgblock" id="modifiedImage">
@@ -78,19 +78,19 @@
           <img class="imgshow" v-if="modified.image_file" :src="modified.image_file" alt="">
         </div>
         <v-btn color="secondary" block
-          style="margin:15px 0px 15px 20px; width:512px; color:white"
+          style="margin:15px 0px 15px calc(50% - 256px); width:512px; color:white"
           :disabled="!modified.image_file"
           @click="sendConfirm">
           CONFIRM
         </v-btn>
       </div>
-      <template slot="next" v-show="modified.image_file!=''">
+      <!-- <template slot="next" v-show="modified.image_file!=''">
         <span class="next">
           <v-btn fab>
             <v-icon>chevron_right</v-icon>
           </v-btn>
         </span>
-      </template>
+      </template> -->
     </carousel>
     <div class="row"
       v-if="output.image_file">
@@ -168,13 +168,15 @@ export default{
       if(!this.inputUrl) return
       this.swal({
         customClass:'loadingModal',
+        allowOutsideClick:false,
         onOpen:() => {
           this.swal.showLoading();
         }
       })
       const formData = new FormData($('#upload-file')[0]);
       // const URL = "http://localhost/AIDemo/public/input.php";
-      const URL = "/predict/send/new";
+      // const URL = "/predict/send/new";
+      const URL = " /predict/send/bigimage";
       this.api.post(URL, formData, {
         headers: {
           'accept': 'application/json',
@@ -211,6 +213,7 @@ export default{
 
       this.swal({
         customClass:'loadingModal',
+        allowOutsideClick:false,
         onOpen:() => {
           this.swal.showLoading();
         }
@@ -256,6 +259,7 @@ export default{
         if (result.value) {
           this.swal({
             customClass:'loadingModal',
+            allowOutsideClick:false,
             onOpen:() => {
               this.swal.showLoading();
             }

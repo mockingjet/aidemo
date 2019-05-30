@@ -11,7 +11,7 @@
           accept=".png, .jpg, .jpeg, .tif"
           @change="previewImage">
       </form>
-          <viewer :options="options">
+    <viewer :options="options" ref="viewer">
       <img :src="inputImage" alt="" style="display:none">
     </viewer>
     </div>
@@ -19,7 +19,6 @@
   </div>
 </template>
 <script>
-import $ from 'jquery'
 import 'viewerjs/dist/viewer.css'
 import Viewer from 'v-viewer'
 import Vue from 'vue'
@@ -40,15 +39,18 @@ export default {
       toolbar: false,
       tooltip: true,
       movable: true,
-      zoomable: true,
-      zoomRatio:0.4,
       rotatable: false,
-      scalable: false,
+      scalable: true,
       transition: true,
       fullscreen: true,
       keyboard: false,
+      zoomable: true,
+      zoomRatio:0.3,
       minZoomRatio:0.01,
-      maxZoomRatio:1
+      maxZoomRatio:1,
+      // viewed(e){
+      //   e.target.viewer.zoomTo(1)
+      // }
     },
   }),
   mounted(){
@@ -59,34 +61,9 @@ export default {
       if(this.inputImage) return
       document.getElementById('uploader').click()
     },
-    previewImage(){
-      this.swal({
-        customClass:'loadingModal',
-        onOpen:() => {
-          this.swal.showLoading();
-        }
-      })
-      // const URL = "http://localhost/AIDemo/public/modify.php";
-      const URL = "/colon/map/v1 ";
-      const formData = new FormData($('#upload-file')[0]);
-      this.api.post(URL, formData, {
-        headers: {
-          'accept': 'application/json',
-          'Accept-Language': 'en-US,en;q=0.8',
-          'Content-Type': `multipart/form-data; boundary=${formData._boundary}`,
-        }
-      }).then((response) => {
-        this.swal.close()
-        this.inputImage = response.data.image_file
-      }).catch((error) => {
-        this.swal.close();
-        this.swal({
-          type:'error',
-          title:'好像發生甚麼問題...',
-          text:error
-        })
-      })
-      // document.body.requestFullscreen();
+    previewImage(e){
+      const file = e.target.files[0]
+      this.inputImage = URL.createObjectURL(file)
     }
   }
 }

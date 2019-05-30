@@ -49,6 +49,7 @@ export default {
     upload(dirname,i) {
       this.swal({
         customClass:'loadingModal',
+        allowOutsideClick:false,
         onOpen:() => {
           this.swal.showLoading();
         }

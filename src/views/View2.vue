@@ -19,7 +19,6 @@
   </div>
 </template>
 <script>
-import $ from 'jquery'
 import quarterImage from '@/views/components/quarterImage.vue'
 export default {
   components:{
@@ -36,33 +35,9 @@ export default {
       if(this.inputImage) return
       document.getElementById('uploader').click()
     },
-    previewImage(){
-      this.swal({
-        customClass:'loadingModal',
-        onOpen:() => {
-          this.swal.showLoading();
-        }
-      })
-      // const URL = "http://localhost/AIDemo/public/modify.php";
-      const URL = "/colon/map/v1";
-      const formData = new FormData($('#upload-file')[0]);
-      this.api.post(URL, formData, {
-        headers: {
-          'accept': 'application/json',
-          'Accept-Language': 'en-US,en;q=0.8',
-          'Content-Type': `multipart/form-data; boundary=${formData._boundary}`,
-        }
-      }).then((response) => {
-        this.swal.close()
-        this.inputImage = response.data.image_file
-      }).catch((error) => {
-        this.swal.close();
-        this.swal({
-          type:'error',
-          title:'好像發生甚麼問題...',
-          text:error
-        })
-      })
+    previewImage(e){
+      const file = e.target.files[0]
+      this.inputImage = URL.createObjectURL(file)
     }
   }
 }
