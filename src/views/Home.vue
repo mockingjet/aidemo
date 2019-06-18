@@ -104,7 +104,8 @@
         </predict-pie>
       </div>
       <div class="col-md-4">
-        <img src="@/assets/preindex.jpg" alt="" style="max-width:100%;">
+        <!-- <img src="@/assets/preindex.jpg" alt="" style="max-width:100%;"> -->
+        <img src="@/assets/newindex.png" alt="" style="max-width:100%;">
       </div>
     </div>
     <show-dbset :dbset="dbset" id="dbset"></show-dbset>

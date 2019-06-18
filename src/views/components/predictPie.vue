@@ -6,11 +6,11 @@ export default {
   mounted () {
     this.renderChart(
       {
-        labels: ['Adenoma', 'Hyperplastic', 'Normal', 'Unknown'],
+        labels: ['Cancer','Adenoma', 'Hyperplastic', 'Normal', 'Unknown'],
         datasets: [
           {
-            label: ['Adenoma', 'Hyperplastic', 'Normal', 'Unknown'],
-            backgroundColor: ['#FF0000','#FFF200','#00FF00','#000000'],
+            label: ['Cancer','Adenoma', 'Hyperplastic', 'Normal', 'Unknown'],
+            backgroundColor: ['#FB000A','#FF7F27','#FFF200','#00FF00','#000000'],
             data: this.percentages
           }
         ],
