@@ -1,7 +1,7 @@
 <template>
   <div class="v-wrapper">
-    <div class="pa-5 my-5 v-frame" @click="uploadImage">
-      {{ inputImage ? '' : 'Upload A Full View Image Here' }}
+    <div class="my-5 v-frame" @click="uploadImage">
+      {{ inputImage ? '' : 'Click Here To Upload An Image' }}
       <form id="upload-file" method="post" enctype="multipart/form-data">
         <input
           type="file"
@@ -93,7 +93,6 @@ export default {
   height: calc(90vh - 100px);
   background-color: #eee;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1);
-  border: 2px solid #aaa;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -105,7 +104,7 @@ export default {
 }
 .v-frame:hover {
   transition: all 0.5s;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.3);
+  box-shadow: 1px 1px 5px 1px rgba(0, 0, 0, 0.3);
 }
 .zoomImage {
   display: inline-block;

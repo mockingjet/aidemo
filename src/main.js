@@ -10,13 +10,19 @@ import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import swal from 'sweetalert2'
 import api from 'axios'
 import 'chartjs-plugin-labels'
+import url from './plugins/url'
 
 Vue.config.productionTip = false
 Vue.prototype.swal = swal;
+api.defaults.withCredentials=true;
 Vue.prototype.api = api;
+Vue.prototype.url = url;
 
 new Vue({
   router,
   store,
-  render: h => h(App)
+  render: h => h(App),
+  beforeCreate() {
+		this.$store.commit('initialiseStore');
+	}
 }).$mount('#app')
