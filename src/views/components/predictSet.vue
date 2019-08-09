@@ -4,12 +4,6 @@
     <v-divider></v-divider>
     <v-list >
       <v-list-tile>
-        <v-list-tile-content>Cancer:</v-list-tile-content>
-        <v-list-tile-content class="align-end">
-          {{predictsets.Cancer.split('|')[0]}}/{{predictsets.Total}} = {{predictsets.Cancer.split('|')[1]}}%
-        </v-list-tile-content>
-      </v-list-tile>
-      <v-list-tile>
         <v-list-tile-content>Adenoma:</v-list-tile-content>
         <v-list-tile-content class="align-end">
           {{predictsets.Adenoma.split('|')[0]}}/{{predictsets.Total}} = {{predictsets.Adenoma.split('|')[1]}}%
@@ -38,7 +32,7 @@
 </template>
 <script>
 export default {
-  props:['predictsets']
+  props:['predictsets'],
 }
 </script>
 

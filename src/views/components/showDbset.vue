@@ -54,9 +54,7 @@ export default {
           this.swal.showLoading();
         }
       })
-      // const URL = "http://localhost/AIDemo/public/input.php";
-      const URL = "/add/data/training";
-      this.api.post(URL, dirname).then(() => {
+      this.api.post(this.url.upload, dirname).then(() => {
         this.hasUploaded[i] = true
         this.$forceUpdate()
         this.swal.close()
@@ -76,9 +74,7 @@ export default {
           this.swal.showLoading();
         }
       })
-      // const URL = "http://localhost/AIDemo/public/input.php"
-      const URL = "/add/data/retrain"
-      this.api.post(URL).then(() => {
+      this.api.post(this.url.retrain).then(() => {
         this.$forceUpdate()
         this.swal.close()
       }).catch((error) => {
@@ -106,29 +102,3 @@ export default {
   box-shadow: 0px 0px 4px grey
 }
 </style>
-
-<!-- <v-dialog v-model="modal" persistent fullscreen>
-  <v-card >
-    <v-toolbar dark color="#555" fixed app>
-      <v-toolbar-title>Database Status</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-toolbar-items>
-        <v-btn dark flat @click="refresh" style="text-transform:none;font-size:16px;letter-spacing:1px">OK, I got it!</v-btn>
-      </v-toolbar-items>
-    </v-toolbar>
-    <v-divider style="margin-top:64px;"></v-divider>
-    <div v-for="(item,i) in dirnames" :key=i
-      style="padding:8px 12px 0px 8px">
-      <v-icon>folder</v-icon>
-      {{item.dirname}}
-      <v-layout row wrap style="padding:10px 25px;">
-        <v-flex xs2 v-for="(file,j) in item.files" :key=j
-          style="margin:2px 0px">
-          <v-icon>image</v-icon>
-          {{file}}
-        </v-flex>
-      </v-layout>
-      <v-divider></v-divider>
-    </div>
-  </v-card>
-</v-dialog> -->
