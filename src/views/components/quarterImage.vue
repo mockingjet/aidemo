@@ -29,7 +29,7 @@
         block
         color="secondary"
         style="margin:15px 5px 15px calc(50% - 256px); width:246px; color:white;position:absolute; bottom:-60px;left:2px"
-        :disabled="record.length < 5"
+        :disabled="record.length < 5 && !(this.record.length==0 && this.former.length==2)"
         @click="openSelector = !openSelector"
       >Modify</v-btn>
       <select-color
@@ -44,7 +44,7 @@
         color="secondary"
         style="margin:15px 5px 15px calc(50% - 256px); width:246px; color:white;position:absolute; bottom:-60px;right:2px"
         @click="diagnoseByGland()"
-        :disabled="record.length < 5"
+        :disabled="record.length < 5 && !(this.record.length==0 && this.former.length==2)"
       >Diagnose By GLand</v-btn>
     </div>
   </div>
@@ -61,7 +61,7 @@ export default {
     former: [],
     record: [],
     openSelector: false,
-    modified_type:'',
+    modified_type: ""
   }),
   mounted() {
     this.nowImage = this.inputImage;
@@ -151,6 +151,7 @@ export default {
       var newImage = c.toDataURL();
       this.nowImage = newImage;
       this.former.push(newImage);
+      if (this.record.length == 5) this.record = [];
       this.record.push(coord);
       this.focusOn(coord);
       this.judgeColor();
@@ -185,8 +186,17 @@ export default {
         this.nowImage = this.former[this.former.length - 2];
         this.former.pop();
         var coord = this.record.pop();
-        this.focusOff(coord);
         this.judgeColor();
+        if (this.record.length == 4 && this.former.length == 1) {
+          var focus = document.querySelector(".focus");
+          focus.style.width = 512 + "px";
+          focus.style.height = 512 + "px";
+          focus.style.top = 0 + "px";
+          focus.style.left = 0 + "px";
+          this.record = [];
+        } else {
+          this.focusOff(coord);
+        }
       }
     },
     focusOff(coord) {
@@ -279,38 +289,29 @@ export default {
         q2_colors = [],
         q3_colors = [],
         q4_colors = [];
-      console.log("q1---------")
       //判斷顏色權重，從上到下，由左至右
       for (let i = q1.top; i <= q1.bottom; i++) {
         for (let j = q1.left; j <= q1.right; j++) {
           if (!q2_colors.includes(colors[i + "_" + j]))
             q1_colors.push(colors[i + "_" + j]);
-            console.log(i+", " + j+" :"+colors[i + "_" + j])
         }
       }
-      console.log("q2---------")
       for (let i = q2.top; i <= q2.bottom; i++) {
         for (let j = q2.left; j <= q2.right; j++) {
           if (!q2_colors.includes(colors[i + "_" + j]))
             q2_colors.push(colors[i + "_" + j]);
-            console.log(i+", " + j+" :"+colors[i + "_" + j])
         }
       }
-      console.log("q3---------")
       for (let i = q3.top; i <= q3.bottom; i++) {
         for (let j = q3.left; j <= q3.right; j++) {
           if (!q3_colors.includes(colors[i + "_" + j]))
             q3_colors.push(colors[i + "_" + j]);
-            console.log(i+", " + j+" :"+colors[i + "_" + j])
-
         }
       }
-      console.log("q4---------")
       for (let i = q4.top; i <= q4.bottom; i++) {
         for (let j = q4.left; j <= q4.right; j++) {
           if (!q4_colors.includes(colors[i + "_" + j]))
             q4_colors.push(colors[i + "_" + j]);
-            console.log(i+", " + j+" :"+colors[i + "_" + j])
         }
       }
       let q1_color = this.finalColor(q1_colors);
@@ -345,12 +346,12 @@ export default {
       quarters[2].style.borderColor = q3;
       quarters[3].style.borderColor = q4;
     },
-     modifyImage(type){
-      if(type === "x") {
-        this.openSelector = false
-        return
+    modifyImage(type) {
+      if (type === "x") {
+        this.openSelector = false;
+        return;
       }
-      const [top, bottom, left, right] = this.findSpot(true)
+      const [top, bottom, left, right] = this.findSpot(true);
       if (bottom == top && left == right) {
         let coord = top + "_" + right;
         this.swal({
@@ -360,22 +361,17 @@ export default {
             this.swal.showLoading();
           }
         });
-        this.api.get(this.url.modifyImage + "?coord=" + coord + "?type=" + type)
+        this.api
+          .get(this.url.modifyImage + "?coord=" + coord + "?type=" + type)
           .then(response => {
-            this.swal.close()
-            this.$emit("returnOutput", response.data)
-            this.nowImage = response.data.image_file
+            this.swal.close();
+            this.$emit("returnOutput", response.data);
             this.$store.commit("getColor", response.data.color);
-            this.record = []
-            this.former = []
-            var focus = document.querySelector(".focus");
-            focus.style.width = 512 + "px";
-            focus.style.height = 512 + "px";
-            focus.style.top = 0 + "px";
-            focus.style.left = 0 + "px";
-            this.judgeColor()
+            this.former = [response.data.image_file, response.data.image_file];
+
+            this.judgeColor();
           });
-        this.openSelector = false
+        this.openSelector = false;
       } else {
         this.swal({
           type: "error",
@@ -384,9 +380,9 @@ export default {
       }
     },
     diagnoseByGland() {
-      const [top, bottom, left, right] = this.findSpot(true)
+      const [top, bottom, left, right] = this.findSpot(true);
       if (bottom == top && left == right) {
-        let coord = top + "_" + right; 
+        let coord = top + "_" + right;
         this.swal({
           customClass: "loadingModal",
           allowOutsideClick: false,
@@ -394,18 +390,19 @@ export default {
             this.swal.showLoading();
           }
         });
-        this.api.get(this.url.diagnoseByGland + "?coord=" + coord)
-          .then( response => {
-            this.swal.close()
-            window.open(response.data.url)
-          })
+        this.api
+          .get(this.url.diagnoseByGland + "?coord=" + coord)
+          .then(response => {
+            this.swal.close();
+            window.open(response.data.url);
+          });
       } else {
         this.swal({
           type: "error",
           title: "抓取圖片位置錯誤"
         });
       }
-    },
+    }
   },
   watch: {
     record() {
