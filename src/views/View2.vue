@@ -39,7 +39,10 @@ import predictPie from "@/views/components/predictPie.vue";
 import showDbset from "@/views/components/showDbset.vue";
 export default {
   components: {
-    quarterImage,predictSet,predictPie,showDbset
+    quarterImage,
+    predictSet,
+    predictPie,
+    showDbset
   },
   data: () => ({
     inputImage: null,
@@ -48,8 +51,8 @@ export default {
       image_file: "",
       color: {},
       predicts: {},
-      dbset:null
-    },
+      dbset: null
+    }
   }),
   mounted() {
     this.inputImage = this.$route.query.url;
@@ -62,10 +65,28 @@ export default {
     previewImage(e) {
       const file = e.target.files[0];
       this.inputImage = URL.createObjectURL(file);
+      let data = new FormData();
+      data.append("image_file", file, file.fileName);
+      this.api
+        .post(this.url.hasImageConfig, data, {
+          headers: {
+            accept: "application/json",
+            "Content-Type": `multipart/form-data; boundary=${data._boundary}`
+          }
+        })
+        .then(response => {
+          if (response.data.hasConfig) {
+            this.$store.commit("getColor", response.data.color);
+            this.swal({ type: "success", title: "參數檔已載入" });
+          } else this.swal({ type: "info", title: "此張圖片沒有進行預測過" });
+        })
+        .catch(error => {
+          this.swal({ type: "error", title: error });
+        });
     },
     getOutput(output) {
-      this.output = output
-      this.inputImage = output.image_file
+      this.output = output;
+      this.inputImage = output.image_file;
     }
   }
 };

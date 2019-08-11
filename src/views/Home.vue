@@ -175,7 +175,7 @@ export default {
         1000
       );
       const formData = new FormData($("#upload-file")[0]);
-      formData.append("parameter",this.parameter);
+      formData.append("parameter", this.parameter);
       this.api
         .post(this.url.diagnoseImage, formData, {
           headers: {
