@@ -13,8 +13,9 @@ import 'chartjs-plugin-labels'
 import url from './plugins/url'
 
 Vue.config.productionTip = false
+
 Vue.prototype.swal = swal;
-api.defaults.withCredentials=true;
+api.defaults.withCredentials = true;
 Vue.prototype.api = api;
 Vue.prototype.url = url;
 
@@ -23,6 +24,6 @@ new Vue({
   store,
   render: h => h(App),
   beforeCreate() {
-		this.$store.commit('initialiseStore');
-	}
+    this.$store.commit('initialiseStore');
+  }
 }).$mount('#app')

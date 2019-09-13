@@ -14,6 +14,7 @@
           />
         </form>
       </div>
+
       <quarterImage v-if="inputImage" :inputImage="inputImage" @returnOutput="getOutput"></quarterImage>
     </div>
     <div class="container">
@@ -67,6 +68,13 @@ export default {
       this.inputImage = URL.createObjectURL(file);
       let data = new FormData();
       data.append("image_file", file, file.fileName);
+      this.swal({
+        customClass: "loadingModal",
+        allowOutsideClick: false,
+        onOpen: () => {
+          this.swal.showLoading();
+        }
+      });
       this.api
         .post(this.url.hasImageConfig, data, {
           headers: {
@@ -75,13 +83,20 @@ export default {
           }
         })
         .then(response => {
+          this.swal.close();
           if (response.data.hasConfig) {
             this.$store.commit("getColor", response.data.color);
-            this.swal({ type: "success", title: "參數檔已載入" });
-          } else this.swal({ type: "info", title: "此張圖片沒有進行預測過" });
+            this.output = response.data;
+            this.swal({ type: "success", title: "辨識結果已載入" });
+          } else {
+            this.swal({ type: "info", title: "此張圖片沒有進行辨識過" });
+            this.$store.commit("getColor", {});
+          }
+
         })
         .catch(error => {
-          this.swal({ type: "error", title: error });
+          this.swal.close();
+          this.swal({ type: "error", title: error.message });
         });
     },
     getOutput(output) {

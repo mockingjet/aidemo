@@ -21,6 +21,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 }
 
 $result['image_file'] = "./out3.jpg";
-$result['url'] = "http://192.168.0.102:8080/#/?url=out3.jpg";
+$result['url'] = "http://192.168.0.102:8081/#/?url=out3.jpg";
 sleep(2);
 echo json_encode($result);

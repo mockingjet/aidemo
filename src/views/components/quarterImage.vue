@@ -3,6 +3,14 @@
     <div class="origin">
       <img :src="inputImage" alt />
       <div class="focus"></div>
+      <v-btn
+        fab
+        class="closeOriginal"
+        style="position:absolute;z-index:1;left:calc(50% - 28px);top:calc(50% - 28px);display:none"
+        @click="refresh"
+      >
+        <v-icon style="line-height:56px;">close</v-icon>
+      </v-btn>
     </div>
     <div class="whole">
       <img class="theImage" :src="nowImage" width="512px" height="512px" />
@@ -24,12 +32,10 @@
         style="position:absolute; right:-95px; top:240px"
       >restore</v-icon>
       <v-btn
-        dark
-        x-large
         block
         color="secondary"
-        style="margin:15px 5px 15px calc(50% - 256px); width:246px; color:white;position:absolute; bottom:-60px;left:2px"
-        :disabled="record.length < 5 && !(this.record.length==0 && this.former.length==2)"
+        style="margin:15px 5px 15px 5px; width:140px; color:white;position:absolute; bottom:-60px; "
+        :disabled="record.length < 5 && !(record.length==0 && former.length==2)"
         @click="openSelector = !openSelector"
       >Modify</v-btn>
       <select-color
@@ -38,18 +44,24 @@
         @returnColor="modifyImage"
       ></select-color>
       <v-btn
-        dark
+        block
+        color="secondary"
+        style="margin:15px 5px 15px 5px; width:140px; color:white;position:absolute; bottom:-60px;left:150px"
+        @click="download($event,downloadImage)"
+      >downlaod</v-btn>
+      <v-btn
         x-large
         block
         color="secondary"
-        style="margin:15px 5px 15px calc(50% - 256px); width:246px; color:white;position:absolute; bottom:-60px;right:2px"
+        style="margin:15px 5px 15px 5px; width:205px; color:white;position:absolute; bottom:-60px;left:300px"
+        :disabled="record.length < 5 && !(record.length==0 && former.length==2)"
         @click="diagnoseByGland()"
-        :disabled="record.length < 5 && !(this.record.length==0 && this.former.length==2)"
       >Diagnose By GLand</v-btn>
     </div>
   </div>
 </template>
 <script>
+import $ from "jquery";
 import selectColor from "@/views/components/selectColor.vue";
 export default {
   props: ["inputImage"],
@@ -61,10 +73,18 @@ export default {
     former: [],
     record: [],
     openSelector: false,
-    modified_type: ""
+    modified_type: "",
+    downloadImage: ""
   }),
   mounted() {
+    $(document).on("mouseenter", ".origin, .closeOriginal", function() {
+      $(".closeOriginal").css("display", "block");
+    });
+    $(document).on("mouseleave", ".origin", function() {
+      $(".closeOriginal").css("display", "none");
+    });
     this.nowImage = this.inputImage;
+    this.downloadImage = this.inputImage;
     this.former.push(this.inputImage);
     this.judgeColor();
   },
@@ -354,6 +374,7 @@ export default {
       const [top, bottom, left, right] = this.findSpot(true);
       if (bottom == top && left == right) {
         let coord = top + "_" + right;
+        let isOnlyView2 = this.$route.query.url ? false : true;
         this.swal({
           customClass: "loadingModal",
           allowOutsideClick: false,
@@ -362,13 +383,22 @@ export default {
           }
         });
         this.api
-          .get(this.url.modifyImage + "?coord=" + coord + "?type=" + type)
+          .get(
+            this.url.modifyImage +
+              "?coord=" +
+              coord +
+              "?type=" +
+              type +
+              "?isOnlyView2=" +
+              isOnlyView2
+          )
           .then(response => {
             this.swal.close();
             this.$emit("returnOutput", response.data);
             this.$store.commit("getColor", response.data.color);
+            this.downloadImage = response.data.image_file;
             this.former = [response.data.image_file, response.data.image_file];
-
+            this.nowImage = response.data.thumb_file;
             this.judgeColor();
           });
         this.openSelector = false;
@@ -383,6 +413,7 @@ export default {
       const [top, bottom, left, right] = this.findSpot(true);
       if (bottom == top && left == right) {
         let coord = top + "_" + right;
+        let isOnlyView2 = this.$route.query.url ? false : true;
         this.swal({
           customClass: "loadingModal",
           allowOutsideClick: false,
@@ -391,7 +422,13 @@ export default {
           }
         });
         this.api
-          .get(this.url.diagnoseByGland + "?coord=" + coord)
+          .get(
+            this.url.diagnoseByGland +
+              "?coord=" +
+              coord +
+              "?isOnlyView2=" +
+              isOnlyView2
+          )
           .then(response => {
             this.swal.close();
             window.open(response.data.url);
@@ -402,6 +439,20 @@ export default {
           title: "抓取圖片位置錯誤"
         });
       }
+    },
+    refresh() {
+      window.location.reload();
+    },
+    download(e, url) {
+      if (!url) return;
+      var pom = document.createElement("a");
+      var filename = Math.round(new Date().getTime() / 1000);
+      pom.setAttribute("href", url);
+      pom.setAttribute("download", filename);
+      pom.style.display = "none";
+      document.body.appendChild(pom);
+      pom.click();
+      document.body.removeChild(pom);
     }
   },
   watch: {
@@ -416,7 +467,8 @@ export default {
           quarters[i].hidden = false;
         }
       }
-    }
+    },
+    "$store.state.color": "judgeColor"
   }
 };
 </script>
@@ -444,12 +496,12 @@ export default {
 }
 .quarter {
   z-index: 2;
-  border: 1px solid blue;
+  border: 2px solid blue;
   width: 256px;
   height: 256px;
 }
 .quarter:hover {
-  border: 3px solid darkblue;
+  border: 10px solid darkblue;
 }
 .origin {
   width: 512px;
@@ -473,5 +525,13 @@ export default {
   z-index: 999;
   right: 240px;
   top: 240px;
+}
+.closeOriginal {
+  transition: all, 0s;
+  opacity: 0.5;
+}
+.closeOriginal:hover {
+  transition: all, 0s;
+  opacity: 1;
 }
 </style>

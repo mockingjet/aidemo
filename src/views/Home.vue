@@ -37,13 +37,13 @@
         </div>
         <v-btn
           color="secondary"
-          style="margin:15px 0px 15px calc(50% - 256px); width:calc(50% - 30px); color:white"
+          style="margin:15px 0px 15px calc(50% - 256px); width:calc(50% - 40px); color:white"
           :disabled="!inputUrl"
           @click="selectParam"
         >Select</v-btn>
         <v-btn
           color="secondary"
-          style="margin:15px 0px 15px calc(50% - 256px); width:calc(50% - 30px); color:white"
+          style="margin:15px 0px 15px calc(50% - 266px); width:calc(50% - 40px); color:white"
           :disabled="!inputUrl"
           @click="diagnoseImage"
         >Diagnose</v-btn>
@@ -87,6 +87,20 @@
       </div>
     </carousel>
     <select-box :options="options" @returnSelect="getSelect"></select-box>
+    <div class="container">
+      <div class="row" v-if="output.image_file">
+        <div class="col-md-4">
+          <predict-set :predictsets="output.data"></predict-set>
+        </div>
+        <div class="col-md-4">
+          <predict-pie :percentages="output.predicts"></predict-pie>
+        </div>
+        <div class="col-md-4">
+          <img src="@/assets/view2index.png" alt style="max-width:100%;" />
+        </div>
+      </div>
+      <!-- <show-dbset :dbset="output.dbset" id="dbset"></show-dbset> -->
+    </div>
   </div>
 </template>
 
@@ -95,11 +109,17 @@ import $ from "jquery";
 import carousel from "vue-owl-carousel";
 import loadingModal from "@/views/components/loadingModal.vue";
 import selectBox from "@/views/components/selectBox.vue";
+import predictSet from "@/views/components/predictSet.vue";
+import predictPie from "@/views/components/predictPie.vue";
+// import showDbset from "@/views/components/showDbset.vue";
 export default {
   components: {
     loadingModal,
     carousel,
-    selectBox
+    selectBox,
+    predictSet,
+    predictPie
+    // showDbset
   },
   data: () => ({
     inputUrl: null,
@@ -117,8 +137,8 @@ export default {
     modified: {
       image_file: ""
     },
-    modal: false,
-    dbset: null
+    modal: false
+    // dbset: null
   }),
   mounted() {
     $(document).on("mouseenter", ".original, .closeOriginal", function() {
@@ -264,7 +284,8 @@ export default {
 }
 .slide {
   padding: 8px 8px 0px 8px;
-  height: 700px;
+  height: 600px;
+  width: 590px;
 }
 .imgblock {
   box-shadow: 0px 0px 10px 2px rgba(0, 0, 0, 0.3);
