@@ -11,14 +11,14 @@
     <div v-for="(item,i) in dbset" :key="i" style="padding:8px 12px 0px 8px;">
       <v-icon>folder</v-icon>
       {{item.typename}}
-      <v-layout row wrap style="padding:10px 25px;">
-        <v-flex xs2 v-for="(file,j) in item.files" :key="j" style="margin:2px 0px">
+      <v-layout class="gallery" row wrap style="padding:10px 25px;">
+        <v-flex xs5 sm4 md3 lg2 v-for="(file,j) in item.files" :key="j" style="margin:2px 0px">
           <v-tooltip right style="cursor:default" color="#fcfcfc" lazy nudge-right="-60">
             <div slot="activator" color="primary">
               <v-icon>image</v-icon>
               {{file}}
             </div>
-            <img class="tooltip" :src="item.dirpath+'/'+file" :alt="file">
+            <img class="tooltip" :src="item.dirpath+'/'+file" :alt="file" />
           </v-tooltip>
         </v-flex>
       </v-layout>

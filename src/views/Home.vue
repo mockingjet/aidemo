@@ -1,93 +1,98 @@
 <template>
-  <div class="container pt-5">
+  <div class="pt-5 container-fluid">
     <loading-modal :loading="loading"></loading-modal>
     <carousel
       ref="carousel"
-      style="position:relative;"
-      :items="2"
+      :responsive="{
+        0:{items:1},
+        1100:{items:2, mouseDrag:false,touchDrag:false}, 
+        1300:{items:2, mouseDrag:false,touchDrag:false,margin:-100}, 
+        1500:{items:2, mouseDrag:false,touchDrag:false,margin:-200}, 
+        1700:{items:2, mouseDrag:false,touchDrag:false,margin:-300},
+      }"
       :nav="false"
       :dots="false"
       :rewind="false"
-      :mouseDrag="false"
-      :touchDrag="false"
     >
-      <div class="slide">
-        <div class="imgblock">
-          <div v-if="!inputUrl" style="cursor:pointer" @click="uploadImage">Click here to upload</div>
-          <form id="upload-file" method="post" enctype="multipart/form-data">
-            <input
-              type="file"
-              name="file"
-              id="imageUpload"
-              style="display:none"
-              accept=".png, .jpg, .jpeg, .tif"
-              @change="previewImage"
-            />
-          </form>
-          <img class="imgshow original" v-if="inputUrl" :src="inputUrl" alt />
-          <v-btn
-            fab
-            class="closeOriginal"
-            style="position:absolute;z-index:1;left:calc(50% - 28px);top:calc(50% - 28px)"
-            v-if="inputUrl"
-            @click="refresh"
-          >
-            <v-icon style="line-height:56px;">close</v-icon>
-          </v-btn>
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="imgblock" @click="uploadImage">
+            <div v-if="!inputUrl" style="cursor:pointer">
+              Click
+              <u>
+                <b>
+                  <i>here</i>
+                </b>
+              </u> to upload
+            </div>
+            <form id="upload-file" method="post" enctype="multipart/form-data">
+              <input
+                type="file"
+                name="file"
+                id="imageUpload"
+                style="display:none"
+                accept=".png, .jpg, .jpeg, .tif"
+                @change="previewImage"
+              />
+            </form>
+            <img class="imgshow original" v-if="inputUrl" :src="inputUrl" alt />
+            <v-btn
+              fab
+              class="closeOriginal"
+              style="position:absolute;z-index:1;left:calc(50% - 28px);top:calc(50% - 28px)"
+              v-if="inputUrl"
+              @click="refresh"
+            >
+              <v-icon style="line-height:56px;">close</v-icon>
+            </v-btn>
+          </div>
+          <div class="row no-gutters">
+            <div class="col-6 pa-1">
+              <v-btn block color="secondary" :disabled="!inputUrl" @click="selectParam">Select</v-btn>
+            </div>
+            <div class="col-6 pa-1">
+              <v-btn block color="secondary" :disabled="!inputUrl" @click="diagnoseImage">Diagnose</v-btn>
+            </div>
+          </div>
         </div>
-        <v-btn
-          color="secondary"
-          style="margin:15px 0px 15px calc(50% - 256px); width:calc(50% - 40px); color:white"
-          :disabled="!inputUrl"
-          @click="selectParam"
-        >Select</v-btn>
-        <v-btn
-          color="secondary"
-          style="margin:15px 0px 15px calc(50% - 266px); width:calc(50% - 40px); color:white"
-          :disabled="!inputUrl"
-          @click="diagnoseImage"
-        >Diagnose</v-btn>
       </div>
-      <div class="slide">
-        <div class="imgblock" id="testImage">
-          <div v-if="!output.image_file">Analysis Result</div>
-          <img class="imgshow" v-if="output.image_file" :src="output.image_file" alt />
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="imgblock" id="testImage">
+            <div v-if="!output.image_file">Analysis Result</div>
+            <img class="imgshow" v-if="output.image_file" :src="output.image_file" alt />
+          </div>
+          <div class="row no-gutters">
+            <div class="col-6 pa-1">
+              <v-btn
+                block
+                color="secondary"
+                :disabled="!output.image_file"
+                @click="download(output.image_file)"
+              >Download</v-btn>
+            </div>
+            <div class="col-3 pa-1">
+              <v-btn
+                block
+                color="secondary"
+                :disabled="!output.image_file"
+                @click="openview('./view1')"
+              >View1</v-btn>
+            </div>
+            <div class="col-3 pa-1">
+              <v-btn
+                block
+                color="secondary"
+                :disabled="!output.image_file"
+                @click="openview('./view2')"
+              >View2</v-btn>
+            </div>
+          </div>
         </div>
-        <v-btn
-          color="secondary"
-          style="margin:15px 5px 15px calc(50% - 256px); width:calc(512px - 220px); color:white"
-          :disabled="!output.image_file"
-          @click="download(output.image_file)"
-        >Download</v-btn>
-        <v-btn
-          color="secondary"
-          style="margin:15px 5px; width:100px; color:white"
-          :disabled="!output.image_file"
-          @click="openview('./view1')"
-        >View1</v-btn>
-        <v-btn
-          color="secondary"
-          :disabled="!output.image_file"
-          style="margin:15px 5px; width:100px; color:white"
-          @click="openview('./view2')"
-        >View2</v-btn>
-      </div>
-      <div class="slide">
-        <div class="imgblock" id="modifiedImage">
-          <div v-if="!modified.image_file">Modified Result</div>
-          <img class="imgshow" v-if="modified.image_file" :src="modified.image_file" alt />
-        </div>
-        <v-btn
-          color="secondary"
-          block
-          style="margin:15px 0px 15px calc(50% - 256px); width:512px; color:white"
-          :disabled="!modified.image_file"
-          @click="sendConfirm"
-        >CONFIRM</v-btn>
       </div>
     </carousel>
     <select-box :options="options" @returnSelect="getSelect"></select-box>
-    <div class="container">
+    <div class="container mt-3">
       <div class="row" v-if="output.image_file">
         <div class="col-md-4">
           <predict-set :predictsets="output.data"></predict-set>
@@ -278,25 +283,29 @@ export default {
   }
 };
 </script>
-<style>
+<style >
 .loadingModal {
   background: transparent !important;
 }
-.slide {
+.slide-wrapper {
   padding: 8px 8px 0px 8px;
-  height: 600px;
-  width: 590px;
+  display: flex;
+  justify-content: center;
 }
 .imgblock {
-  box-shadow: 0px 0px 10px 2px rgba(0, 0, 0, 0.3);
+  border: 1px solid lightgrey;
+  border-radius: 4px;
+  box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.3);
   height: 512px;
   width: 512px;
   display: flex;
-  margin-left: calc(50% - 256px);
   justify-content: center;
   line-height: 512px;
   font-size: 24px;
-  position: relative;
+}
+.imgblock:hover {
+  transition: all 0.2s;
+  box-shadow: 2px 2px 6px 4px rgba(0, 0, 0, 0.3);
 }
 .imgshow {
   width: 100%;
@@ -308,19 +317,11 @@ export default {
 .closeOriginal:hover {
   opacity: 1;
 }
-.prev {
-  position: absolute;
-  left: -60px;
-  top: calc(50% - 96px);
-}
-.next {
-  position: absolute;
-  right: -60px;
-  top: calc(50% - 96px);
-}
-.prev i,
-.next i {
-  zoom: 1.5;
-  cursor: pointer;
+@media (max-width: 567px) {
+  .slide-wrapper,
+  .slide,
+  .imgblock {
+    width: 100%;
+  }
 }
 </style>

@@ -1,5 +1,83 @@
 <template>
-  <div class="v-cabinet my-5">
+  <div class="container-fluid">
+    <carousel
+      ref="carousel"
+      :responsive="{
+        0:{items:1},
+        1100:{items:2, mouseDrag:false,touchDrag:false}, 
+        1300:{items:2, mouseDrag:false,touchDrag:false,margin:-100}, 
+        1500:{items:2, mouseDrag:false,touchDrag:false,margin:-200}, 
+        1700:{items:2, mouseDrag:false,touchDrag:false,margin:-300},
+      }"
+      :nav="false"
+      :dots="false"
+      :rewind="false"
+    >
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="origin">
+            <img :src="inputImage" alt />
+            <div class="focus"></div>
+            <v-btn fab class="closeOriginal" @click="refresh">
+              <v-icon style="line-height:56px;">close</v-icon>
+            </v-btn>
+          </div>
+        </div>
+      </div>
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="whole">
+            <img class="theImage" :src="nowImage" width="512px" height="512px" />
+            <img class="trueImage" :src="nowImage" style="display:none" />
+            <div class="quarter" @click="quarter(1)"></div>
+            <div class="quarter" @click="quarter(2)"></div>
+            <div class="quarter" @click="quarter(3)"></div>
+            <div class="quarter" @click="quarter(4)"></div>
+            <img
+              @click="traceback"
+              class="traceback"
+              v-show="former[former.length-2]"
+              :src="former[former.length-2] ? former[former.length-2] : former[former.length-1]"
+            />
+            <v-icon
+              x-large
+              class="restore"
+              @click="traceback"
+              v-show="former[former.length-2]"
+            >restore</v-icon>
+          </div>
+
+          <div class="row no-gutters">
+            <div class="col-4 pa-1">
+              <v-btn
+                block
+                color="secondary"
+                :disabled="record.length < 5 && !(record.length==0 && former.length==2)"
+                @click="openSelector = !openSelector"
+              >Modify</v-btn>
+            </div>
+            <div class="col-4 pa-1">
+              <v-btn block color="secondary" @click="download(downloadImage)">downlaod</v-btn>
+            </div>
+            <div class="col-4 pa-1">
+              <v-btn
+                block
+                color="secondary"
+                :disabled="record.length < 5 && !(record.length==0 && former.length==2)"
+                @click="diagnoseByGland()"
+              >Diagnose By GLand</v-btn>
+            </div>
+          </div>
+          <select-color
+            :show="openSelector"
+            style="position:absolute; bottom:-30px;left:123px"
+            @returnColor="modifyImage"
+          ></select-color>
+        </div>
+      </div>
+    </carousel>
+  </div>
+  <!-- <div class="v-cabinet my-5">
     <div class="origin">
       <img :src="inputImage" alt />
       <div class="focus"></div>
@@ -58,14 +136,16 @@
         @click="diagnoseByGland()"
       >Diagnose By GLand</v-btn>
     </div>
-  </div>
+  </div>-->
 </template>
 <script>
 import $ from "jquery";
+import carousel from "vue-owl-carousel";
 import selectColor from "@/views/components/selectColor.vue";
 export default {
   props: ["inputImage"],
   components: {
+    carousel,
     selectColor
   },
   data: () => ({
@@ -206,7 +286,6 @@ export default {
         this.nowImage = this.former[this.former.length - 2];
         this.former.pop();
         var coord = this.record.pop();
-        this.judgeColor();
         if (this.record.length == 4 && this.former.length == 1) {
           var focus = document.querySelector(".focus");
           focus.style.width = 512 + "px";
@@ -214,7 +293,9 @@ export default {
           focus.style.top = 0 + "px";
           focus.style.left = 0 + "px";
           this.record = [];
+          this.judgeColor();
         } else {
+          this.judgeColor();
           this.focusOff(coord);
         }
       }
@@ -251,6 +332,7 @@ export default {
         bottom = 32;
       while (record[0]) {
         coord = record.shift();
+        console.log(coord);
         switch (coord) {
           case 1:
             right -= Math.ceil((right - left) / 2);
@@ -359,7 +441,7 @@ export default {
       return borderColor;
     },
     changeColor(q1, q2, q3, q4) {
-      // console.log(q1, q2, q3, q4);
+      console.log(q1, q2, q3, q4);
       var quarters = document.getElementsByClassName("quarter");
       quarters[0].style.borderColor = q1;
       quarters[1].style.borderColor = q2;
@@ -393,13 +475,18 @@ export default {
               isOnlyView2
           )
           .then(response => {
-            this.swal.close();
             this.$emit("returnOutput", response.data);
             this.$store.commit("getColor", response.data.color);
-            this.downloadImage = response.data.image_file;
-            this.former = [response.data.image_file, response.data.image_file];
-            this.nowImage = response.data.thumb_file;
-            this.judgeColor();
+            let new_image =
+              response.data.image_file + "?time=" + new Date().getTime();
+            this.inputImage = new_image + "?time=" + new Date().getTime();
+            this.downloadImage = new_image;
+            this.former = [new_image, new_image];
+            this.nowImage =
+              response.data.thumb_file + "?time=" + new Date().getTime();
+          })
+          .finally(() => {
+            this.swal.close();
           });
         this.openSelector = false;
       } else {
@@ -443,7 +530,7 @@ export default {
     refresh() {
       window.location.reload();
     },
-    download(e, url) {
+    download(url) {
       if (!url) return;
       var pom = document.createElement("a");
       var filename = Math.round(new Date().getTime() / 1000);
@@ -468,28 +555,24 @@ export default {
         }
       }
     },
-    "$store.state.color": "judgeColor"
+    "$store.state.color": {
+      deep: true,
+      handler() {
+        this.judgeColor();
+        console.log("judged");
+      }
+    }
   }
 };
 </script>
 <style>
-.v-cabinet {
+/* .v-cabinet {
   width: 1024px + 90px;
   display: flex;
   flex-direction: row;
   margin-left: calc(50vw - 768px - 45px);
-}
-.whole {
-  width: 512px;
-  height: 512px;
-  background-position: center;
-  background-size: contain;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  position: relative;
-  margin-left: 90px;
-}
+} */
+
 .theImage {
   position: absolute;
   z-index: 1;
@@ -520,15 +603,34 @@ export default {
   height: 512px;
   border: 3px dashed orangered;
 }
-.btn-restore {
+.whole {
+  width: 512px;
+  height: 512px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  position: relative;
+}
+.traceback {
   position: absolute;
-  z-index: 999;
-  right: 240px;
+  right: -120px;
+  width: 90px !important;
+  height: 90px;
+  top: 216px;
+}
+.restore {
+  position: absolute;
+  right: -95px;
   top: 240px;
 }
 .closeOriginal {
   transition: all, 0s;
   opacity: 0.5;
+  position: absolute;
+  z-index: 1;
+  left: calc(50% - 28px);
+  top: calc(50% - 28px);
+  display: none;
 }
 .closeOriginal:hover {
   transition: all, 0s;

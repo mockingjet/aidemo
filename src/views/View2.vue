@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div class="pt-5 container-fluid">
     <div class="v-wrapper">
-      <div v-if="!inputImage" class="pa-5 my-5 v-frame" @click="uploadImage">
+      <div v-if="!inputImage" class="v-frame" @click="uploadImage">
         <span>Upload A Full View Image Here</span>
         <form id="upload-file" method="post" enctype="multipart/form-data">
           <input
@@ -17,7 +17,7 @@
 
       <quarterImage v-if="inputImage" :inputImage="inputImage" @returnOutput="getOutput"></quarterImage>
     </div>
-    <div class="container">
+    <div class="container mt-3">
       <div class="row" v-if="output.image_file">
         <div class="col-md-4">
           <predict-set :predictsets="output.data"></predict-set>
@@ -92,7 +92,6 @@ export default {
             this.swal({ type: "info", title: "此張圖片沒有進行辨識過" });
             this.$store.commit("getColor", {});
           }
-
         })
         .catch(error => {
           this.swal.close();
@@ -108,10 +107,8 @@ export default {
 </script>
 <style scoped>
 .v-wrapper {
-  width: 1024px;
   display: flex;
   justify-content: center;
-  margin-left: calc(50vw - 512px);
 }
 .v-frame {
   width: 512px;

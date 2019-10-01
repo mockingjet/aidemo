@@ -11,6 +11,8 @@ import swal from 'sweetalert2'
 import api from 'axios'
 import 'chartjs-plugin-labels'
 import url from './plugins/url'
+import VueMq from 'vue-mq'
+
 
 Vue.config.productionTip = false
 
@@ -18,6 +20,14 @@ Vue.prototype.swal = swal;
 api.defaults.withCredentials = true;
 Vue.prototype.api = api;
 Vue.prototype.url = url;
+Vue.use(VueMq, {
+  breakpoints: {
+    xs: 576,
+    sm: 991,
+    md: 1200,
+    lg: Infinity,
+  },
+})
 
 new Vue({
   router,

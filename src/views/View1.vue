@@ -10,10 +10,10 @@
           style="display:none"
           accept=".png, .jpg, .jpeg, .tif"
           @change="previewImage"
-        >
+        />
       </form>
       <viewer :options="options" ref="viewer">
-        <img :src="inputImage" alt style="display:none">
+        <img :src="inputImage" alt style="display:none" />
       </viewer>
       <!-- <div style>
         <img :src="inputImage" alt :style="zoomImage" class="zoomImage">
@@ -109,6 +109,11 @@ export default {
 .zoomImage {
   display: inline-block;
   overflow: auto;
+}
+@media (max-width: 567px) {
+  .v-frame {
+    font-size: 20px;
+  }
 }
 </style>
 
