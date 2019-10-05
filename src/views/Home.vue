@@ -1,112 +1,132 @@
 <template>
-  <div class="container pt-5">
+  <div class="pt-5 container-fluid">
     <carousel
       ref="carousel"
-      style="position:relative;"
-      :items="2"
+      style="position:relative"
+      :responsive="{
+        0:{items:1},
+        1200:{items:2, mouseDrag:false,touchDrag:false}, 
+        1400:{items:2, mouseDrag:false,touchDrag:false}, 
+        1600:{items:2, mouseDrag:false,touchDrag:false}, 
+        1800:{items:2, mouseDrag:false,touchDrag:false},
+      }"
       :nav="false"
       :dots="false"
       :rewind="false"
-      :mouseDrag="false"
-      :touchDrag="false"
     >
       <template slot="prev">
-        <span class="prev">
+        <span class="prev" style="z-index:999">
           <v-btn fab>
             <v-icon>chevron_left</v-icon>
           </v-btn>
         </span>
       </template>
-      <div class="slide">
-        <div class="imgblock">
-          <div v-if="!inputUrl" style="cursor:pointer" @click="uploadImage">Click here to upload</div>
-          <form id="upload-file" method="post" enctype="multipart/form-data">
-            <input
-              type="file"
-              name="file"
-              id="imageUpload"
-              style="display:none"
-              accept=".png, .jpg, .jpeg, .tif"
-              @change="previewImage"
+
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="imgblock" @click="uploadImage">
+            <div v-if="!inputUrl" style="cursor:pointer">
+              Click
+              <u>
+                <b>
+                  <i>here</i>
+                </b>
+              </u> to upload
+            </div>
+            <form id="upload-file" method="post" enctype="multipart/form-data">
+              <input
+                type="file"
+                name="file"
+                id="imageUpload"
+                style="display:none"
+                accept=".png, .jpg, .jpeg, .tif"
+                @change="previewImage"
+              />
+            </form>
+            <img class="imgshow original" v-if="inputUrl" :src="inputUrl" alt />
+            <v-btn
+              fab
+              class="closeOriginal"
+              style="position:absolute;z-index:1;left:calc(50% - 28px);top:calc(50% - 28px)"
+              v-if="inputUrl"
+              @click="refresh"
             >
-          </form>
-          <img class="imgshow original" v-if="inputUrl" :src="inputUrl" alt>
+              <v-icon style="line-height:56px;">close</v-icon>
+            </v-btn>
+          </div>
+          <div class="row no-gutters">
+            <div class="col-6 pa-1">
+              <v-btn color="secondary" block :disabled="!inputUrl" @click="selectParam">Select</v-btn>
+            </div>
+            <div class="col-6 pa-1">
+              <v-btn
+                block
+                color="secondary"
+                :disabled="!inputUrl || !parameter"
+                @click="diagnoseImage"
+              >Diagnose</v-btn>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="imgblock" id="testImage">
+            <div v-if="!output.image_file">Analysis Result</div>
+            <img class="imgshow" v-if="output.image_file" :src="output.image_file" alt />
+            <image-circle
+              v-for="(circle,i) in output.image_circles"
+              :key="i"
+              :circle="circle"
+              :nth="i"
+              @returnColor="getColor"
+            ></image-circle>
+          </div>
           <v-btn
-            fab
-            class="closeOriginal"
-            style="position:absolute;z-index:1;left:calc(50% - 28px);top:calc(50% - 28px)"
-            v-if="inputUrl"
-            @click="refresh"
-          >
-            <v-icon style="line-height:56px;">close</v-icon>
-          </v-btn>
+            block
+            color="secondary"
+            :disabled="!output.image_file"
+            @click="download(output.image_file)"
+          >Download</v-btn>
         </div>
-        <v-btn
-          color="secondary"
-          style="margin:15px 0px 15px calc(50% - 256px); width:calc(50% - 30px); color:white"
-          :disabled="!inputUrl"
-          @click="selectParam"
-        >Select</v-btn>
-        <v-btn
-          color="secondary"
-          style="margin:15px 0px 15px calc(50% - 256px); width:calc(50% - 30px); color:white"
-          :disabled="!inputUrl || !parameter"
-          @click="diagnoseImage"
-        >Diagnose</v-btn>
       </div>
-      <div class="slide">
-        <div class="imgblock" id="testImage">
-          <div v-if="!output.image_file">Analysis Result</div>
-          <img class="imgshow" v-if="output.image_file" :src="output.image_file" alt>
-          <image-circle
-            v-for="(circle,i) in output.image_circles"
-            :key="i"
-            :circle="circle"
-            :nth="i"
-            @returnColor="getColor"
-          ></image-circle>
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="imgblock" id="modifiedImage">
+            <div v-if="!modified.image_file">Modified Result</div>
+            <img class="imgshow" v-if="modified.image_file" :src="modified.image_file" alt />
+          </div>
+          <v-btn
+            color="secondary"
+            block
+            :disabled="!modified.image_file"
+            @click="sendConfirm"
+          >CONFIRM</v-btn>
         </div>
-        <v-btn
-          color="secondary"
-          style="margin:15px 5px 15px calc(50% - 256px); width:512px; color:white"
-          :disabled="!output.image_file"
-          @click="download(output.image_file)"
-        >Download</v-btn>
-      </div>
-      <div class="slide">
-        <div class="imgblock" id="modifiedImage">
-          <div v-if="!modified.image_file">Modified Result</div>
-          <img class="imgshow" v-if="modified.image_file" :src="modified.image_file" alt>
-        </div>
-        <v-btn
-          color="secondary"
-          block
-          style="margin:15px 0px 15px calc(50% - 256px); width:512px; color:white"
-          :disabled="!modified.image_file"
-          @click="sendConfirm"
-        >CONFIRM</v-btn>
       </div>
       <template slot="next" v-show="modified.image_file!=''">
-        <span class="next">
+        <span class="next" style="z-index:999">
           <v-btn fab>
             <v-icon>chevron_right</v-icon>
           </v-btn>
         </span>
       </template>
     </carousel>
-    <div class="row" v-if="output.image_file">
-      <div class="col-md-4">
-        <predict-set :predictsets="output.data"></predict-set>
-      </div>
-      <div class="col-md-4">
-        <predict-pie :percentages="output.predicts"></predict-pie>
-      </div>
-      <div class="col-md-4">
-        <img src="@/assets/preindex.jpg" alt style="max-width:100%;">
-      </div>
-    </div>
-    <show-dbset :dbset="dbset" id="dbset"></show-dbset>
     <select-box :options="options" @returnSelect="getSelect"></select-box>
+    <div class="container mt-3">
+      <div class="row" v-if="output.image_file">
+        <div class="col-md-4">
+          <predict-set :predictsets="output.data"></predict-set>
+        </div>
+        <div class="col-md-4">
+          <predict-pie :percentages="output.predicts"></predict-pie>
+        </div>
+        <div class="col-md-4">
+          <img src="@/assets/preindex.jpg" alt style="max-width:100%;" />
+        </div>
+      </div>
+      <show-dbset :dbset="dbset" id="dbset"></show-dbset>
+    </div>
   </div>
 </template>
 
@@ -184,7 +204,8 @@ export default {
     diagnoseImage() {
       if (!this.parameter) return;
       const formData = new FormData($("#upload-file")[0]);
-      formData.append("parameter",this.parameter);
+      formData.append("parameter", this.parameter);
+      formData.append("image_file", this.inputUrl);
       this.swal({
         customClass: "loadingModal",
         allowOutsideClick: false,
@@ -197,9 +218,7 @@ export default {
           headers: {
             accept: "application/json",
             "Accept-Language": "en-US,en;q=0.8",
-            "Content-Type": `multipart/form-data; boundary=${
-              formData._boundary
-            }`
+            "Content-Type": `multipart/form-data; boundary=${formData._boundary}`
           }
         })
         .then(response => {
@@ -212,7 +231,8 @@ export default {
               type: ""
             };
           }
-          this.output.image_file = this.output.image_file+'?time='+Date.now()
+          this.output.image_file =
+            this.output.image_file + "?time=" + Date.now();
         })
         .catch(error => {
           this.swal.close();
@@ -325,20 +345,25 @@ export default {
 .loadingModal {
   background: transparent !important;
 }
-.slide {
+.slide-wrapper {
   padding: 8px 8px 0px 8px;
-  height: 700px;
+  display: flex;
+  justify-content: center;
 }
 .imgblock {
-  box-shadow: 0px 0px 10px 2px rgba(0, 0, 0, 0.3);
+  border: 1px solid lightgrey;
+  border-radius: 4px;
+  box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.3);
   height: 512px;
   width: 512px;
   display: flex;
-  margin-left: calc(50% - 256px);
   justify-content: center;
   line-height: 512px;
   font-size: 24px;
-  position: relative;
+}
+.imgblock:hover {
+  transition: all 0.2s;
+  box-shadow: 2px 2px 6px 4px rgba(0, 0, 0, 0.3);
 }
 .imgshow {
   width: 100%;
@@ -352,17 +377,46 @@ export default {
 }
 .prev {
   position: absolute;
-  left: -60px;
+  left: -30px;
   top: calc(50% - 96px);
 }
 .next {
   position: absolute;
-  right: -60px;
+  right: -30px;
   top: calc(50% - 96px);
+}
+.prev,
+.next {
+  zoom: 0.85;
 }
 .prev i,
 .next i {
-  zoom: 1.5;
+  zoom: 1.2;
   cursor: pointer;
+}
+@media (max-width: 567px) {
+  .slide-wrapper,
+  .slide,
+  .imgblock {
+    width: 100%;
+  }
+  .prev,
+  .next {
+    display: none;
+  }
+}
+@media (max-width: 765px) {
+  .prev,
+  .next {
+    display: none;
+  }
+}
+@media (max-width: 1200px) {
+  .prev {
+    left: 5vw;
+  }
+  .next {
+    right: 5vw;
+  }
 }
 </style>
