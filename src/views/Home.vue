@@ -71,7 +71,7 @@
       </div>
       <div class="slide-wrapper">
         <div class="slide">
-          <div class="imgblock" id="testImage">
+          <div class="imgblock" id="testImage" style="position:relative">
             <div v-if="!output.image_file">Analysis Result</div>
             <img class="imgshow" v-if="output.image_file" :src="output.image_file" alt />
             <image-circle
@@ -288,6 +288,8 @@ export default {
     download(url) {
       var pom = document.createElement("a");
       var filename = url.replace(/^.*[\\/]/, "");
+      console.log(filename);
+      filename = filename.substring(0, filename.indexOf("?time="));
       filename = filename.replace(".", "_result.");
       pom.setAttribute("href", url);
       pom.setAttribute("download", filename);

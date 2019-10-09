@@ -1,17 +1,18 @@
 <template>
-  <div class="imgcircle" 
+  <div
+    class="imgcircle"
     slot="activator"
     @click="show=!show"
     :style="
       this.color == 'white'
       ? 'top:'+this.y+'px;left:'+this.x+'px;border-color:'+this.color
       : 'top:'+this.y+'px;left:'+this.x+'px;border-color:'+this.color+';border-width:5px;border-style:solid'
-    ">
-    <div class="options" v-show="show">
-      <div class="option"
-        v-for="(option, index) in options"
-        :key="index">
-        <v-list-tile-title small
+    "
+  >
+    <div class="options" v-show="show" :style="'top:'+this.optionsY+'px'">
+      <div class="option" v-for="(option, index) in options" :key="index">
+        <v-list-tile-title
+          small
           style="text-align:center"
           @click="change($event,option.color)"
         >{{ option.text }}</v-list-tile-title>
@@ -20,73 +21,76 @@
   </div>
 </template>
 <script>
-import $ from 'jquery'
+import $ from "jquery";
 export default {
-  props:['circle','nth'],
-  data:()=>({
-    show:false,
-    x:null,
-    y:null,
-    color:'white',
+  props: ["circle", "nth"],
+  data: () => ({
+    show: false,
+    x: null,
+    y: null,
+    color: "white",
     options: [
-      { text: 'x', color: '' },
-      { text: 'Adenoma', color:'#FB000A' },
-      { text: 'Hyperplastic', color:'#FFF200' },
-      { text: 'Normal', color:'#26E32C' },
-      { text: 'Unknown', color:'black' },
-      { text: 'No Change', color:'white'}
+      { text: "x", color: "" },
+      { text: "Adenoma", color: "#FB000A" },
+      { text: "Hyperplastic", color: "#FFF200" },
+      { text: "Normal", color: "#26E32C" },
+      { text: "Unknown", color: "black" },
+      { text: "No Change", color: "white" }
     ]
   }),
   mounted() {
     var w = $(".imgshow").width();
     var h = $(".imgshow").height();
-    this.x = (this.circle.x*w-10)/100
-    this.y = ((100 - this.circle.y)*h-10)/100 
+    this.x = (this.circle.x * w - 10) / 100;
+    this.y = ((100 - this.circle.y) * h - 10) / 100;
   },
-  methods:{
-    change(e,color) {
-      if(color){
-        this.color = color
-        var type=''
-        for(var i=0;i<6;i++) 
-        {
-          if(this.options[i].color==color)
-            type = this.options[i].text
+  methods: {
+    change(e, color) {
+      if (color) {
+        this.color = color;
+        var type = "";
+        for (var i = 0; i < 6; i++) {
+          if (this.options[i].color == color) type = this.options[i].text;
         }
-        this.$emit('returnColor',this.nth,type);
+        this.$emit("returnColor", this.nth, type);
       }
     }
+  },
+  computed: {
+    optionsY() {
+      if (this.y > 512 - 200) return -170;
+      return 10;
+    }
   }
-}
+};
 </script>
 <style>
-.imgcircle{
+.imgcircle {
   cursor: pointer;
-  position:absolute;
-  width:30px;
-  height:30px;
-}
-.imgcircle:hover{
-  transition:all .2s;
-  border-width:5px;
-  border-style :solid;
-}
-.options{
   position: absolute;
-  top:10px;
-  left:10px;
-  z-index:9 !important;
+  width: 30px;
+  height: 30px;
+}
+.imgcircle:hover {
+  transition: all 0.2s;
+  border-width: 5px;
+  border-style: solid;
+}
+.options {
+  position: absolute;
+  left: 10px;
+  z-index: 999 !important;
   background: white;
   border-radius: 2px;
-  box-shadow:1px 1px 10px black;
+  box-shadow: 1px 1px 10px black;
 }
-.option{
-  padding:3px 8px;
-  font-size:14px;
+.option {
+  padding: 3px 8px;
+  font-size: 14px;
   position: relative;
 }
-.option:hover{
-  background-color: rgba(0,0,0,0.1);
-  transition: all .2s;
+.option:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
 }
 </style>
